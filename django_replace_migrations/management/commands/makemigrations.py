@@ -12,6 +12,11 @@ from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.migration import SwappableTuple
+from django.db.migrations.operations.special import (
+    RunPython,
+    RunSQL,
+    SeparateDatabaseAndState,
+)
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner,
@@ -144,6 +149,9 @@ class Command(BaseCommand):
                 has_bad_labels = True
         if has_bad_labels:
             sys.exit(2)
+
+        loader_from_disk = MigrationLoader(None, ignore_no_migrations=True)
+        loader_from_disk.load_disk()
 
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
@@ -299,8 +307,22 @@ class Command(BaseCommand):
                             for dependency in app_migration.dependencies
                             if dependency not in app_migration.replaces
                         ]
+                        for app_label, name in app_migration.replaces:
+                            app_migration.operations += [
+                                operation
+                                for operation in loader_from_disk.get_migration(
+                                    app_label, name
+                                ).operations
+                                if (
+                                    isinstance(operation, RunPython)
+                                    or isinstance(operation, RunSQL)
+                                    or isinstance(operation, SeparateDatabaseAndState)
+                                )
+                            ]
             else:
                 self.write_migration_files(changes)
+
+            self.write_migration_files(changes)
             if check_changes:
                 sys.exit(1)
 
