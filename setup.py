@@ -38,7 +38,7 @@ setup(
     author="GitGuardian",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
-    install_requires=["django>=2.1"],
+    install_requires=["django>=4.2"],
     extras_require={},
     keywords="django migration replace squash squashmigrations database",
     classifiers=[
@@ -51,8 +51,7 @@ setup(
         "Framework :: Django :: 3.0",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )
