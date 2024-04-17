@@ -392,7 +392,9 @@ class Command(BaseCommand):
                     migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     if self.replace_all:
-                        self.stdout.write("  Replaces '%s'." % migration.replaces)
+                        self.stdout.write(
+                            "  Replaces '%s'." % sorted(migration.replaces)
+                        )
                     for operation in migration.operations:
                         self.log("    - %s" % operation.describe())
                     if self.scriptable:
@@ -520,7 +522,7 @@ class Command(BaseCommand):
                     {
                         "dependencies": [
                             (app_label, migration.name)
-                            for migration in merge_migrations
+                            for migration in sorted(merge_migrations)
                         ],
                     },
                 )
