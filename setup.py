@@ -1,4 +1,5 @@
 # Copyright 2019 3YOURMIND GmbH
+# Copyright 2024 GitGuardian
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,8 +33,8 @@ setup(
     version=VERSION,
     description="This package is an extension to djangos makemigrations.py. It can be used to get rid of old migrations as an alternative to djangos squashmigration command.",
     long_description=long_description,
-    url="https://github.com/3YOURMIND/django-replace-migrations",
-    author="3YOURMIND GmbH",
+    url="https://github.com/GitGuardian/django-replace-migrations",
+    author="GitGuardian",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
     install_requires=["django>=2.1"],
