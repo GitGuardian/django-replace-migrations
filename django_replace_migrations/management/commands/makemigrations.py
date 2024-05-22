@@ -93,6 +93,12 @@ class Command(BaseCommand):
                 "resulting operations."
             ),
         )
+        parser.add_argument(
+            "--replace-all",
+            action="store_true",
+            dest="replace_all",
+            help="Create fresh migrations that replaces existing ones.",
+        )
 
     @property
     def log_output(self):
@@ -118,6 +124,7 @@ class Command(BaseCommand):
             self.dry_run = True
         self.scriptable = options["scriptable"]
         self.update = options["update"]
+        self.replace_all = options["replace_all"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
         if self.scriptable:
             self.stderr.style_func = None
@@ -209,11 +216,28 @@ class Command(BaseCommand):
                 log=self.log,
             )
         # Set up autodetector
-        autodetector = MigrationAutodetector(
-            loader.project_state(),
-            ProjectState.from_apps(apps),
-            questioner,
-        )
+        if self.replace_all:
+            replace_list = [migration for migration in loader.graph.nodes.values()]
+            temp_nodes = loader.graph.nodes
+
+            loader.graph.nodes = {
+                k: v for (k, v) in loader.graph.nodes.items() if k[0] not in app_labels
+            }
+
+            autodetector = MigrationAutodetector(
+                loader.project_state(),
+                ProjectState.from_apps(apps),
+                questioner,
+            )
+
+            loader.graph.nodes = temp_nodes
+
+        else:
+            autodetector = MigrationAutodetector(
+                loader.project_state(),
+                ProjectState.from_apps(apps),
+                questioner,
+            )
 
         # If they want to make an empty migration, make one for each app
         if self.empty:
@@ -255,6 +279,19 @@ class Command(BaseCommand):
         else:
             if self.update:
                 self.write_to_last_migration_files(changes)
+            elif self.replace_all:
+                for app_label, app_migrations in changes.items():
+                    for app_migration in app_migrations:
+                        app_migration.replaces = [
+                            (migration.app_label, migration.name)
+                            for migration in replace_list
+                            if migration.app_label == app_label
+                        ]
+                        app_migration.dependencies = [
+                            dependency
+                            for dependency in app_migration.dependencies
+                            if dependency not in app_migration.replaces
+                        ]
             else:
                 self.write_migration_files(changes)
             if check_changes:
@@ -347,6 +384,8 @@ class Command(BaseCommand):
                     # directory, or an absolute path otherwise.
                     migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
+                    if self.replace_all:
+                        self.stdout.write("  Replaces '%s'." % migration.replaces)
                     for operation in migration.operations:
                         self.log("    - %s" % operation.describe())
                     if self.scriptable:
