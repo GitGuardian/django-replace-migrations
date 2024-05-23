@@ -22,6 +22,10 @@ from django.db.migrations.state import ProjectState
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 
+from .replace_migration_autodetector import ReplaceMigrationAutodetector
+from .replace_migration_loader import ReplaceMigrationLoader
+from .replace_migration_writer import ReplaceMigrationWriter
+
 
 class Command(BaseCommand):
     help = "Creates new migration(s) for apps."
@@ -143,7 +147,10 @@ class Command(BaseCommand):
 
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
-        loader = MigrationLoader(None, ignore_no_migrations=True)
+        if self.replace_all:
+            loader = ReplaceMigrationLoader(None, ignore_no_migrations=True)
+        else:
+            loader = MigrationLoader(None, ignore_no_migrations=True)
 
         # Raise an error if any migrations are applied before their dependencies.
         consistency_check_labels = {config.label for config in apps.get_app_configs()}
@@ -224,19 +231,19 @@ class Command(BaseCommand):
                 k: v for (k, v) in loader.graph.nodes.items() if k[0] not in app_labels
             }
 
-            autodetector = MigrationAutodetector(
-                loader.project_state(),
-                ProjectState.from_apps(apps),
-                questioner,
+            autodetector = ReplaceMigrationAutodetector(
+                from_state=loader.project_state(),
+                to_state=ProjectState.from_apps(apps),
+                questioner=questioner,
             )
 
             loader.graph.nodes = temp_nodes
 
         else:
             autodetector = MigrationAutodetector(
-                loader.project_state(),
-                ProjectState.from_apps(apps),
-                questioner,
+                from_state=loader.project_state(),
+                to_state=ProjectState.from_apps(apps),
+                questioner=questioner,
             )
 
         # If they want to make an empty migration, make one for each app
@@ -378,7 +385,7 @@ class Command(BaseCommand):
                 self.log(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
             for migration in app_migrations:
                 # Describe the migration
-                writer = MigrationWriter(migration, self.include_header)
+                writer = ReplaceMigrationWriter(migration, self.include_header)
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
