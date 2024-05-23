@@ -30,11 +30,15 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 
 setup(
-    name="django-replace-migrations",
+    name="gg-django-replace-migrations",
     version=VERSION,
-    description="This package is an extension to djangos makemigrations.py. It can be used to get rid of old migrations as an alternative to djangos squashmigration command.",
+    description=(
+        "This package offers a new command: replace_all_migrations. It can be"
+        " used to get rid of old migrations as an alternative to djangos"
+        " squashmigration command."
+    ),
     long_description=long_description,
-    url="https://github.com/GitGuardian/django-replace-migrations",
+    url="https://gitlab.gitguardian.ovh/gg-code/gg-django-replace-migrations",
     author="GitGuardian",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
