@@ -285,7 +285,7 @@ class Command(BaseCommand):
                             os.remove(prev_path)
                             self.log(f"Deleted {rel_prev_path}")
                 elif self.verbosity == 3:
-                    # Alternatively, replaceallmigrations --dry-run --verbosity 3
+                    # Alternatively, --dry-run --verbosity 3
                     # will log the migrations rather than saving the file to
                     # the disk.
                     self.log(
