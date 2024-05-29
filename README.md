@@ -1,13 +1,12 @@
 # gg-django-replace-migrations
 
 This package offers a new django command: `replace_all_migrations`.
-It can be used to get rid of old migrations as an alternative to djangos `squashmigration` command.
+It can be use to get rid of old migrations as an alternative to django's `squashmigration` command.
 
 ## Reasoning
 
 In big django projects, migration files easily pile up and get an increasing problem.
-Django comes with the squashmigration command - however, it is hard to handle because of multiple reasons.
-Especially, it can not handle circular dependencies - they must be resolved [manually and with great care](https://stackoverflow.com/questions/37711402/circular-dependency-when-squashing-django-migrations).
+Django comes with the squashmigration command - however, it is hard to handle because of multiple reasons. Especially, it can not handle circular dependencies - they must be resolved [manually and with great care](https://stackoverflow.com/questions/37711402/circular-dependency-when-squashing-django-migrations).
 
 One possible solution is to:
 
@@ -17,13 +16,11 @@ One possible solution is to:
 
 This workflow might work fine, if you have only few (production) servers - however, it becomes hard, when you have many environments with different versions of your application.
 
-With gg-django-replace-migrations also creates new initial migrations, but also, additionally, adds the already existing migrations to the `replace` list of the new migration
-(That list is used by `squashmigrations` as well). By doing that, faking migrations is not needed anymore.
+gg-django-replace-migrations also creates new initial migrations, but also, additionally, it adds the already existing migrations to the `replace` list of the new migration (That list is used by `squashmigrations` as well). By doing that, faking migrations is not needed anymore.
 
 ## Warning
 
-The new replacing migrations will not consider any `RunPython` or `RunSQL` operations.
-That might be acceptable depending on your use of those operations and if you need those to prepare a fresh database.
+The new replacing migrations will add not elidable special operations (`RunPython`, `RunSQL` or `SeparateDatabaseAndState`) at the end of the squash files. You will have to manually add them when suitable.
 
 ## Installation
 
@@ -45,7 +42,13 @@ If your apps are not depending on each other, you can use gg-django-replace-migr
 ./manage.py replace_all_migrations --name replace [app1, app2, ...]
 ```
 
-Note, that you will need to [list all of your apps](https://stackoverflow.com/questions/4111244/get-a-list-of-all-installed-applications-in-django-and-their-attributes) explicitly - otherwise django will also try to replace migrations from dependencies.
+Note, that you will need to list all of your apps explicitly - otherwise django will also try to replace migrations from dependencies:
+
+```
+from django.apps import apps
+print(" ".join(map(str, sorted({model._meta.app_label for model in apps.get_models()}))))
+```
+
 While `--name` could be omitted, it is highly recommended to use it so that you can easily recognize the new migrations.
 
 If for any of your apps there are not one but two or more migrations created, your apps are depending on each other (see below).
@@ -87,7 +90,3 @@ If your app is below 2.0 and you want to update to something after 2.0, you firs
 - upgrading from 1.0 to 1.5 will be possible
 - upgrading from 2.0 to 3.0 will be possible
 - upgrading from 1.0 to 3.0 will be **not** possible
-
-## `makemigration.py` compatibility
-
-This package requires deep integration into `makemigrations.py` so that I needed to copy the whole `makemigrations.py` here. Currently the version of `makemigrations.py` is copied from Django 2.1, however it is also tested with Django 3.0 and works there as well. If you encounter problems, please write what version of Django you are using.
