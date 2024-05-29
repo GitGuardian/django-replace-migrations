@@ -1,4 +1,4 @@
-# gg-django-replace-migrations
+# django-replace-migrations
 
 This package offers a new django command: `replace_all_migrations`.
 It can be use to get rid of old migrations as an alternative to django's `squashmigration` command.
@@ -6,6 +6,7 @@ It can be use to get rid of old migrations as an alternative to django's `squash
 ## Reasoning
 
 In big django projects, migration files easily pile up and get an increasing problem.
+
 Django comes with the squashmigration command - however, it is hard to handle because of multiple reasons. Especially, it can not handle circular dependencies - they must be resolved [manually and with great care](https://stackoverflow.com/questions/37711402/circular-dependency-when-squashing-django-migrations).
 
 One possible solution is to:
@@ -16,7 +17,7 @@ One possible solution is to:
 
 This workflow might work fine, if you have only few (production) servers - however, it becomes hard, when you have many environments with different versions of your application.
 
-gg-django-replace-migrations also creates new initial migrations, but also, additionally, it adds the already existing migrations to the `replace` list of the new migration (That list is used by `squashmigrations` as well). By doing that, faking migrations is not needed anymore.
+django-replace-migrations also creates new initial migrations, but also, additionally, it adds the already existing migrations to the `replace` list of the new migration (That list is used by `squashmigrations` as well). By doing that, faking migrations is not needed anymore.
 
 ## Warning
 
@@ -29,7 +30,7 @@ Before you install, read the workflow below. You need to have the app installed 
 Run
 
 ```
-pip install gg-django-replace-migrations
+pip install django-replace-migrations
 ```
 
 and add `gg_django_replace_migrations` to your list of installed apps.
@@ -73,7 +74,7 @@ The workflow for this would be:
 - commit and note the commit hash
 - `git checkout 2.0`
 - create a new branch `git checkout -b 2-0-replace-migrations`
-- Install `gg-django-replace-migration` here.
+- Install `django-replace-migration` here.
 - run `./manage.py replace_all_migrations --name replace_2_0 app1, app2, ...` ([How to get all apps](https://stackoverflow.com/questions/4111244/get-a-list-of-all-installed-applications-in-django-and-their-attributes))
 - commit and note the commit hash
 - `git checkout [your main/feature branch]`

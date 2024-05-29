@@ -99,9 +99,9 @@ class ReplaceMigrationWriter(MigrationWriter):
             ) % "\n# ".join(sorted(migration_imports))
         # If there's a replaces, make a string for it
         if self.migration.replaces:
-            items[
-                "replaces_str"
-            ] = f"\n    replaces = {self.serialize(sorted(self.migration.replaces))[0]}\n"
+            items["replaces_str"] = (
+                f"\n    replaces = {self.serialize(sorted(self.migration.replaces))[0]}\n"
+            )
         # Hinting that goes into comment
         if self.include_header:
             items["migration_header"] = MIGRATION_HEADER_TEMPLATE % {
@@ -126,15 +126,9 @@ MIGRATION_HEADER_TEMPLATE = """\
 MIGRATION_TEMPLATE = """\
 %(migration_header)s%(imports)s
 
-from phased_migrations.constants import DeployPhase
-
 
 class Migration(migrations.Migration):
-    # Note: deploy_phase was added to ensure consistency with no down time
-    # it is possible that this migration in not really compatible with pre-deploy
-    deploy_phase = DeployPhase.pre_deploy
-
-    squashed_with_gg_script = True
+    squashed_with_script = True
 
 %(replaces_str)s%(initial_str)s
     dependencies = [
