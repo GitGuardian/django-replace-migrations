@@ -1,6 +1,6 @@
-# django-replace-migrations
+# gg-django-replace-migrations
 
-This package is an extension to djangos `makemigrations.py`.
+This package offers a new django command: `replace_all_migrations`.
 It can be used to get rid of old migrations as an alternative to djangos `squashmigration` command.
 
 ## Reasoning
@@ -17,7 +17,7 @@ One possible solution is to:
 
 This workflow might work fine, if you have only few (production) servers - however, it becomes hard, when you have many environments with different versions of your application.
 
-With django-replace-migrations also creates new initial migrations, but also, additionally, adds the already existing migrations to the `replace` list of the new migration
+With gg-django-replace-migrations also creates new initial migrations, but also, additionally, adds the already existing migrations to the `replace` list of the new migration
 (That list is used by `squashmigrations` as well). By doing that, faking migrations is not needed anymore.
 
 ## Warning
@@ -32,17 +32,17 @@ Before you install, read the workflow below. You need to have the app installed 
 Run
 
 ```
-pip install django-replace-migrations
+pip install gg-django-replace-migrations
 ```
 
-and add `django_replace_migrations` to your list of installed apps.
+and add `gg_django_replace_migrations` to your list of installed apps.
 
 ## Simple Workflow
 
-If your apps are not depending on each other, you can use django-replace-migrations like this:
+If your apps are not depending on each other, you can use gg-django-replace-migrations like this:
 
 ```
-./manage.py makemigratons --replace-all --name replace [app1, app2, ...]
+./manage.py replace_all_migrations --name replace [app1, app2, ...]
 ```
 
 Note, that you will need to [list all of your apps](https://stackoverflow.com/questions/4111244/get-a-list-of-all-installed-applications-in-django-and-their-attributes) explicitly - otherwise django will also try to replace migrations from dependencies.
@@ -70,8 +70,8 @@ The workflow for this would be:
 - commit and note the commit hash
 - `git checkout 2.0`
 - create a new branch `git checkout -b 2-0-replace-migrations`
-- Install `django-replace-migration` here.
-- run `./manage.py makemigrations --replace-all --name replace_2_0 app1, app2, ...` ([How to get all apps](https://stackoverflow.com/questions/4111244/get-a-list-of-all-installed-applications-in-django-and-their-attributes))
+- Install `gg-django-replace-migration` here.
+- run `./manage.py replace_all_migrations --name replace_2_0 app1, app2, ...` ([How to get all apps](https://stackoverflow.com/questions/4111244/get-a-list-of-all-installed-applications-in-django-and-their-attributes))
 - commit and note the commit hash
 - `git checkout [your main/feature branch]`
 - `git cherry-pick [commit-hash from 2-0-delete-migrations]`
