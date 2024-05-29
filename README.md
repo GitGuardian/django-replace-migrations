@@ -33,7 +33,7 @@ Run
 pip install django-replace-migrations
 ```
 
-and add `gg_django_replace_migrations` to your list of installed apps.
+and add `django_replace_migrations` to your list of installed apps.
 
 ## Simple Workflow
 

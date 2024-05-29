@@ -30,7 +30,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 
 setup(
-    name="gg-django-replace-migrations",
+    name="django-replace-migrations",
     version=VERSION,
     description=(
         "This package offers a new command: replace_all_migrations. It can be"
@@ -38,8 +38,8 @@ setup(
         " squashmigration command."
     ),
     long_description=long_description,
-    url="https://gitlab.gitguardian.ovh/gg-code/gg-django-replace-migrations",
-    author="GitGuardian",
+    url="https://github.com/3YOURMIND/django-replace-migrations",
+    author="3YOURMIND GmbH",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
     install_requires=["django>=4.2"],
