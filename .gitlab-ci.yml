@@ -20,4 +20,6 @@ publish:
   only:
     - tags
   script:
-    - pdm publish --verbose --repository ${CI_API_V4_URL}/projects/package-registries%2Fpython-package-registry/packages/pypi --username ${PYPI_USERNAME}  --password ${PYPI_PASSWORD}
+    - pip install twine build
+    - python -m build
+    - twine upload --verbose --repository-url https://gitlab.gitguardian.ovh/api/v4/projects/435/packages/pypi/ --username ${PYPI_USERNAME}  --password ${PYPI_PASSWORD} dist/*
