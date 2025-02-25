@@ -66,6 +66,15 @@ class Command(BaseCommand):
                 "paths of generated migration files to stdout."
             ),
         )
+        parser.add_argument(
+            "--keep-special-operations",
+            action="store_true",
+            dest="keep_special_operations",
+            help=(
+                "Keep RunPython, RunSQL and SeparateDatabaseAndState "
+                "operations in the new migration files."
+            ),
+        )
 
     @property
     def log_output(self):
@@ -85,6 +94,7 @@ class Command(BaseCommand):
             raise CommandError("The migration name must be a valid Python identifier.")
         self.include_header = options["include_header"]
         self.scriptable = options["scriptable"]
+        self.keep_special_operations = options["keep_special_operations"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
         if self.scriptable:
             self.stderr.style_func = None
@@ -218,18 +228,20 @@ class Command(BaseCommand):
                         for dependency in app_migration.dependencies
                         if dependency not in app_migration.replaces
                     ]
-                    for app_label, name in app_migration.replaces:
-                        app_migration.operations += [
-                            operation
-                            for operation in loader_from_disk.get_migration(
-                                app_label, name
-                            ).operations
-                            if (
-                                isinstance(operation, RunPython)
-                                or isinstance(operation, RunSQL)
-                                or isinstance(operation, SeparateDatabaseAndState)
-                            )
-                        ]
+                    if self.keep_special_operations:
+                        # keep the special operations in the migration files
+                        for app_label, name in app_migration.replaces:
+                            app_migration.operations += [
+                                operation
+                                for operation in loader_from_disk.get_migration(
+                                    app_label, name
+                                ).operations
+                                if (
+                                    isinstance(operation, RunPython)
+                                    or isinstance(operation, RunSQL)
+                                    or isinstance(operation, SeparateDatabaseAndState)
+                                )
+                            ]
 
             self.write_migration_files(changes)
 
