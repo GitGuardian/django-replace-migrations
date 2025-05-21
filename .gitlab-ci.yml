@@ -1,0 +1,25 @@
+variables:
+  PDM_PYPI_URL: https://gitlab.gitguardian.ovh/api/v4/projects/435/packages/pypi/simple
+  PDM_PYPI_USERNAME: $PYPI_USERNAME
+  PDM_PYPI_PASSWORD: $PYPI_PASSWORD
+
+stages:
+  - tests
+  - release
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "main"
+    - when: never # no pipeline on feature branch pushes, only MRs
+
+publish:
+  image: 513715405986.dkr.ecr.us-west-2.amazonaws.com/basics/python:3.11-slim-bullseye
+  stage: release
+  only:
+    - tags
+  script:
+    - pip install twine build
+    - python -m build
+    - twine upload --verbose --repository-url https://gitlab.gitguardian.ovh/api/v4/projects/435/packages/pypi/ --username ${PYPI_USERNAME}  --password ${PYPI_PASSWORD} dist/*
