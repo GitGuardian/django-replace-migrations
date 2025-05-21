@@ -48,9 +48,9 @@ class ReplaceMigrationWriter(MigrationWriter):
         items["special_operations"] = (
             "\n    # /!\\ PRINT ALL THE SPECIAL OPERATIONS\n"
             + "    # /!\\ MUST BE MANUALLY REVIEWED\n\n"
-            + "   special_operations = [\n"
+            + "    special_operations = [\n"
             + special_ops
-            + "   ]\n"
+            + "    ]\n"
             if special_ops
             else ""
         )
@@ -125,7 +125,6 @@ MIGRATION_HEADER_TEMPLATE = """\
 
 MIGRATION_TEMPLATE = """\
 %(migration_header)s%(imports)s
-
 from phased_migrations.constants import DeployPhase
 
 
